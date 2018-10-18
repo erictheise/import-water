@@ -4,7 +4,6 @@ set -o pipefail
 set -o nounset
 
 readonly WATER_POLYGONS_FILE="$IMPORT_DATA_DIR/water_polygons.shp"
-readonly SIMPLIFIED_WATER_POLYGONS_FILE="$IMPORT_DATA_DIR/simplified_water_polygons.shp"
 
 function exec_psql() {
     PGPASSWORD=$POSTGRES_PASSWORD psql --host="$POSTGRES_HOST" --port="$POSTGRES_PORT" --dbname="$POSTGRES_DB" --username="$POSTGRES_USER"
@@ -41,21 +40,12 @@ function import_water() {
     drop_table "$table_name"
     import_shp "$WATER_POLYGONS_FILE" "$table_name"
 
-    local gen1_table_name="osm_ocean_polygon_gen1"
-    drop_table "$gen1_table_name"
-    generalize_water "$gen1_table_name" "$table_name" 20
-
-    local gen2_table_name="osm_ocean_polygon_gen2"
-    drop_table "$gen2_table_name"
-    generalize_water "$gen2_table_name" "$table_name" 40
-
-    local gen3_table_name="osm_ocean_polygon_gen3"
-    drop_table "$gen3_table_name"
-    generalize_water "$gen3_table_name" "$table_name" 80
-
-    local gen4_table_name="osm_ocean_polygon_gen4"
-    drop_table "$gen4_table_name"
-    generalize_water "$gen4_table_name" "$table_name" 160
+    for shapefile in $IMPORT_DATA_DIR do
+      local table_name=$shapefile
+      drop_table table_name
+      echo "CREATE TABLE $table_name from $shapefile"
+      import_shp $shapefile $table_name
+    done
 }
 
 import_water
