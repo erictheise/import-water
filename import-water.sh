@@ -3,8 +3,6 @@ set -o errexit
 set -o pipefail
 set -o nounset
 
-readonly WATER_POLYGONS_FILE="$IMPORT_DATA_DIR/water_polygons.shp"
-
 function exec_psql() {
     PGPASSWORD=$POSTGRES_PASSWORD psql --host="$POSTGRES_HOST" --port="$POSTGRES_PORT" --dbname="$POSTGRES_DB" --username="$POSTGRES_USER"
 }
@@ -36,16 +34,16 @@ function generalize_water() {
 }
 
 function import_water() {
-    local table_name="osm_ocean_polygon"
+  echo "Importing OpenStreetMapData water polygons to PostGIS"
+  for shapefile in $IMPORT_DATA_DIR/*.shp; do
+    [ -e "$shapefile" ] || continue
+    local file_name=${shapefile##*/}
+    local table_name=osmd_${file_name%.*}
+    echo "shapefile: $shapefile filename: $file_name table: $table_name"
     drop_table "$table_name"
-    import_shp "$WATER_POLYGONS_FILE" "$table_name"
-
-    for shapefile in $IMPORT_DATA_DIR do
-      local table_name=$shapefile
-      drop_table table_name
-      echo "CREATE TABLE $table_name from $shapefile"
-      import_shp $shapefile $table_name
-    done
+    echo "CREATE TABLE $table_name from $shapefile"
+    import_shp "$shapefile" "$table_name"
+  done
 }
 
 import_water
