@@ -19,7 +19,7 @@ function hide_inserts() {
 
 function drop_table() {
     local table=$1
-    local drop_command="DROP TABLE IF EXISTS $table;"
+    local drop_command="DROP TABLE IF EXISTS $table CASCADE;"
     echo "$drop_command" | exec_psql
 }
 
