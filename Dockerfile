@@ -9,9 +9,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && wget --quiet http://data.openstreetmapdata.com/water-polygons-generalized-3857.zip \
     && unzip -oj water-polygons-generalized-3857.zip -d $IMPORT_DATA_DIR \
     && rm water-polygons-generalized-3857.zip \
-    && wget --quiet http://data.openstreetmapdata.com/water-polygons-split-3857.zip \
-    && unzip -oj water-polygons-split-3857.zip -d $IMPORT_DATA_DIR \
-    && rm water-polygons-split-3857.zip \
+    && wget --quiet http://data.openstreetmapdata.com/water-polygons-complete-3857.zip \
+    && unzip -oj water-polygons-complete-3857.zip -d $IMPORT_DATA_DIR \
+    && rm water-polygons-complete-3857.zip \
     && ls -l $IMPORT_DATA_DIR \
     && apt-get -y --auto-remove purge \
       wget \
